@@ -1,0 +1,26 @@
+.App{
+    min-height: 100vh;
+    width:100vw;
+    display: flex;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: black;
+    font-size: 24px;
+    background-size: cover;  
+    background-position: center; 
+    background-repeat: no-repeat;
+    flex-direction: column; 
+    align-items: center; 
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(136, 136, 136, 0.281);
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
