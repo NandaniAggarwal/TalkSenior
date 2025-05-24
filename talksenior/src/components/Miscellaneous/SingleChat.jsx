@@ -9,6 +9,10 @@ import { getSender,getSenderFull } from '../config/ChatLogics';
 import ProfileModal from './ProfileModal';
 import UpdateGroupChatModal from './UpdateGroupChatModal';
 import { Spinner,FormControl ,Input} from '@chakra-ui/react';
+import axios from "axios";
+import { useEffect } from 'react';
+import '../../components/style.css'
+import ScrollableChat from '../Miscellaneous/ScrollableChat'
 
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -18,14 +22,41 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [newMessage, setNewMessage] = useState("");
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
+ 
   const toast = useToast();
-  const { selectedChat, setSelectedChat, user } =ChatState();
+  const { selectedChat, setSelectedChat, user ,notification, setNotification} =ChatState();
 
 
-  const fetchMessages = async () => {}
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      setLoading(true);
+      const {data} = await axios.get(
+        `/api/message/${selectedChat._id}`,
+        config
+      );
+      setMessages(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error Occured!",
+        description: "Failed to Load the Messages",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }}
 
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if (event.key === "Enter" && newMessage.trim()) {
       try {
         const config = {
           headers: {
@@ -33,18 +64,31 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             Authorization: `Bearer ${user.token}`,
           },
         };
-        console.log(response.data)
         setNewMessage("");
-        const response = await axios.post(
+        const { data }= await axios.post(
           "/api/message",
           {
             content: newMessage,
-            chatId: selectedChat,
+            chatId: selectedChat._id,
           },
           config
         );
-        setMessages([...messages, response.data]);
+        setMessages([...messages, data]);
       } catch (error) {
+        if(error.response && error.response.data){
+    console.error("Server Response Error:", error.response.data);
+    toast({
+      title: "Error Occurred!",
+      description: error.response.data.message || "Failed to send the Message",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  } else {
+    console.error("Unknown error:", error);
+  }
+        console.log(error);
         toast({
           title: "Error Occured!",
           description: "Failed to send the Message",
@@ -56,8 +100,26 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }
   }
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
 
-  const typingHandler = (e) => {}
+
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+    if (!typing) {
+      setTyping(true);
+    }
+    let lastTypingTime = new Date().getTime();
+    var timerLength = 3000;
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      var timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLength && typing) {
+        setTyping(false);
+      }
+    }, timerLength);
+  }
 
   return (
     <div>
@@ -115,7 +177,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
             ) : (
               <div className="messages">
-                {/*<ScrollableChat messages={messages} />*/}
+                <ScrollableChat messages={messages} />
               </div>
             )}
 

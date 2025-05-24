@@ -20,7 +20,7 @@ const allUsers = asyncHandler(async (req, res) => {
   try {
       const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
       console.log("✅ Users Found:", users);
-      res.json(users);
+      res.send(users);
   } catch (error) {
       console.error("❌ Error Searching Users:", error);
       res.status(500).json({ message: "Error fetching users" });
