@@ -35,7 +35,8 @@
 
 | Home Page | Chat Interface | 
 |-----------|----------------|
-| ![](screenshots/home.png) | ![](screenshots/chat.png) | 
+| ![image](https://github.com/user-attachments/assets/d8a5f4ce-c026-48e2-8dd1-3ac33ac9df0f) |
+![image](https://github.com/user-attachments/assets/cbcdb527-5149-435d-87b6-6981a4aa773d) | 
 
 ---
 
