@@ -14,6 +14,9 @@ import {
 import { useToast } from "@chakra-ui/react";
 import axios from 'axios';
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
+import { HStack } from "@chakra-ui/react";
+import { Select } from "@chakra-ui/react";
+
 
 const Signup = () => {
   const [show, setShow] = useState(false);
@@ -21,14 +24,18 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pic, setPic] = useState("");
-  const [loading,setLoading]=useState(false)
+  const [loading,setLoading]=useState(false);
+  const [branch, setBranch] = useState("");
+  const [year, setYear] = useState("");
+  const [canGuide, setCanGuide] = useState([]);      
+  
   const toast=useToast();
   const history=useHistory();
 
   const handleClick = () => setShow(!show);
   const submitHandler = async () => {
     setLoading(true);
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !branch || !year) {
       toast({
         title: "Please Fill all the Feilds",
         status: "warning",
@@ -53,6 +60,9 @@ const Signup = () => {
           email,
           password,
           pic,
+          branch,
+          year,
+          canGuide
         },
         config
       );
@@ -199,6 +209,75 @@ border="1px solid rgba(255, 255, 255, 0.2)"
             onChange={(e) => postDetails(e.target.files[0])}
           />
         </FormControl>
+
+        <FormControl isRequired>
+  <FormLabel fontSize="sm" color="black">Branch & Year</FormLabel>
+  <HStack spacing={4}>
+    {/* Branch Dropdown */}
+    <Select
+      placeholder="Select Branch"
+      size="sm"
+      borderColor="gray.300"
+      focusBorderColor="white"
+      _placeholder={{ color: "#B3A7FF" }}
+      bg="whiteAlpha.300"
+  sx={{
+    option: {
+      bg: "#F1EFFF",      // background of each dropdown option
+      color: "#3F3D56",    // text color of option
+    },
+    "option:hover": {
+      bg: "#D6C9FF",       // hover background
+    },
+  }}
+      onChange={(e) => setBranch(e.target.value)}
+    >
+      <option value="CSE-AI">CSE-AI</option>
+      <option value="CSE">CSE</option>
+      <option value="IT">IT</option>
+      <option value="ECE-AI">ECE-AI</option>
+      <option value="ECE">ECE</option>
+      <option value="MECH">MECH</option>
+
+    </Select>
+    {/* Year Dropdown */}
+    <Select
+      placeholder="Select Year"
+      size="sm"
+      borderColor="gray.300"
+      focusBorderColor="white"
+      _placeholder={{ color: "#B3A7FF" }}
+      onChange={(e) => setYear(e.target.value)}
+      bg="whiteAlpha.300"
+  sx={{
+    option: {
+      bg: "#F1EFFF",      // background of each dropdown option
+      color: "#3F3D56",    // text color of option
+    },
+    "option:hover": {
+      bg: "#D6C9FF",       // hover background
+    },
+  }}
+    >
+      <option value="1st">1st Year</option>
+      <option value="2nd">2nd Year</option>
+      <option value="3rd">3rd Year</option>
+      <option value="4th">4th Year</option>
+      <option value="alumni">Alumni</option>
+    </Select>
+  </HStack>
+</FormControl>
+<FormControl id="canGuide" isRequired>
+  <FormLabel fontSize="sm" color="black">Topics You Can Guide On</FormLabel>
+  <Input
+    size="sm"
+    placeholder="e.g. DSA, ML, Open Source"
+    _placeholder={{ color: "#B3A7FF" }}
+    borderColor="gray.300"
+    focusBorderColor="white"
+    onChange={(e) => setCanGuide(e.target.value.split(",").map(s => s.trim()))}
+  />
+</FormControl>
 
         <Button
           width="100%"

@@ -106,7 +106,7 @@ const MyChats = ({fetchAgain,setFetchAgain}) => {
     p={3}
     bg="rgba(255, 255, 255, 0.7)" // Transparent soft white background
     w="100%"
-    height="100%"
+    maxHeight="70vh"
     borderRadius="lg"
     overflowY="auto"
     boxShadow="md"

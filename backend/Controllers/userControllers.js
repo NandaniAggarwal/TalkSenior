@@ -27,7 +27,6 @@ const allUsers = asyncHandler(async (req, res) => {
   }
 });
 
-
 /*
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
@@ -45,8 +44,8 @@ const allUsers = asyncHandler(async (req, res) => {
 // i is for case sensitive and ne is for not equals to and regex is for matching the pattern 
 */
 const registeredUser=asyncHandler(async (req,res)=>{
-      const {name,email,password,pic}=req.body;
-      if (!name || !email || !password) {
+      const {name,email,password,pic,branch,year,canGuide}=req.body;
+      if (!name || !email || !password || !branch || !year) {
           res.status(400);
           throw new Error("Please Enter all the Feilds");
       }
@@ -55,7 +54,7 @@ const registeredUser=asyncHandler(async (req,res)=>{
           res.status(400);
           throw new Error("User already exists");
       }
-      const user = await User.create({name,email,password,pic});
+      const user = await User.create({name,email,password,pic,branch,year,canGuide});
       if (user) {
         const token = generateToken(user._id);
           res.status(201).json({
@@ -63,6 +62,9 @@ const registeredUser=asyncHandler(async (req,res)=>{
             name: user.name,
             email: user.email,
             pic: user.pic,
+            branch:user.branch,
+            year:user.year,
+            canGuide:user.canGuide,
             token:token
           });
         } else {
@@ -80,6 +82,9 @@ const authUser = asyncHandler(async (req, res) => {
           name: user.name,
           email: user.email,
           pic: user.pic,
+          branch: user.branch,
+          year: user.year,
+          canGuide:user.canGuide,
           token: generateToken(user._id)
         });
       } else {
@@ -87,5 +92,22 @@ const authUser = asyncHandler(async (req, res) => {
         throw new Error("Invalid Email or Password");
       }
 });
+
+const getRecommendedSeniors = asyncHandler(async (req, res) => {
+  const { year, topic } = req.query;
+
+  if (!year || !topic) {
+    res.status(400);
+    throw new Error("Please provide year and topic");
+  }
+
+  const seniors = await User.find({
+    year: year,
+    canGuide: { $in: [topic] },
+  }).select("-password"); // remove password for safety
+
+  res.json(seniors);
+});
+
   
-module.exports={registeredUser,authUser,allUsers};
+module.exports={registeredUser,authUser,allUsers,getRecommendedSeniors};
