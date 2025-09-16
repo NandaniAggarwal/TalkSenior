@@ -4,6 +4,7 @@ import { Button } from '@chakra-ui/react'
 import { Route,Switch } from 'react-router-dom/cjs/react-router-dom'
 import Homepage from './Pages/Homepage'
 import Chatpage from './Pages/Chatpage'
+import "./index.css"
 
 function App() {
   return (

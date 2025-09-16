@@ -5,6 +5,8 @@ import App from './App.jsx'
 import { Provider } from './components/ui/provider';
 import { BrowserRouter } from 'react-router-dom/cjs/react-router-dom';
 import ChatProvider from './Context/chatProvider';
+import "./index.css"
+
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ChatProvider>
