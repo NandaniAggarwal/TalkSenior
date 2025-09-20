@@ -16,6 +16,7 @@ import axios from 'axios';
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { HStack } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
 const Signup = () => {
@@ -54,7 +55,7 @@ const Signup = () => {
         },
       };
       const { data } = await axios.post(
-        "/api/user",
+        `${backendUrl}/api/user`,
         {
           name,
           email,

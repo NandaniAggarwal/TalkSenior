@@ -4,6 +4,7 @@ import Login from '../components/Authentication/Login'
 import Signup from '../components/Authentication/Signup'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom'
 import { useEffect } from 'react'
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Homepage = () => {
   const history = useHistory();

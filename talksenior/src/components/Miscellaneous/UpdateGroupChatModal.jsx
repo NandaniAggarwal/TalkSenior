@@ -309,6 +309,7 @@ import axios from "axios";
 import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user } = ChatState();
@@ -330,7 +331,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` },
       };
-      const response = await axios.get(`/api/user?search=${query}`, config);
+      const response = await axios.get(`${backendUrl}/api/user?search=${query}`, config);
       setSearchResult(response.data);
     } catch (error) {
       toast({
@@ -356,7 +357,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       };
   
       const response = await axios.put(
-        `/api/chat/rename`,
+        `${backendUrl}/api/chat/rename`,
         { chatId: selectedChat._id, chatName: groupChatName },
         config
       );
@@ -425,7 +426,7 @@ const handleAddUser = async (user1) => {
       headers: { Authorization: `Bearer ${user.token}` },
     };
     const response = await axios.put(
-      `/api/chat/groupadd`,
+      `${backendUrl}/api/chat/groupadd`,
       { chatId: selectedChat._id, userId: user1._id },
       config
     );
@@ -476,7 +477,7 @@ const handleAddUser = async (user1) => {
         headers: { Authorization: `Bearer ${user.token}` },
       };
       const response = await axios.put(
-        `/api/chat/groupremove`,
+        `${backendUrl}/api/chat/groupremove`,
         { chatId: selectedChat._id, userId: user1._id },
         config
       );

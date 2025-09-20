@@ -20,7 +20,7 @@ import { Select } from '@chakra-ui/react';
 import { Button } from '@chakra-ui/react';
 import { VStack } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom';
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
 const ENDPOINT= "http://localhost:5000";
@@ -64,7 +64,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       };
       setLoading(true);
       const {data} = await axios.get(
-        `/api/message/${selectedChat._id}`,
+        `${backendUrl}/api/message/${selectedChat._id}`,
         config
       );
       setMessages(data);
@@ -95,7 +95,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         };
         setNewMessage("");
         const { data }= await axios.post(
-          "/api/message",
+          `${backendUrl}/api/message`,
           {
             content: newMessage,
             chatId: selectedChat._id,
@@ -191,7 +191,7 @@ const handleFindSeniors = async () => {
     return;
   }
   try {
-    const { data } = await axios.get(`/api/user/seniors?year=${selectedYear}&topic=${needHelpTopic}`);
+    const { data } = await axios.get(`${backendUrl}/api/user/seniors?year=${selectedYear}&topic=${needHelpTopic}`);
     console.log("Matched Seniors:", data);
     setRecommendedSeniors(data);
     // Show the seniors in a modal/card below this box
@@ -210,7 +210,7 @@ const accessChat = async (userId) => {
       },
     };
 
-    const { data } = await axios.post(`/api/chat`, { userId }, config);
+    const { data } = await axios.post(`${backendUrl}/api/chat`, { userId }, config);
 
     if (!chats.find((c) => c._id === data._id)) {
       setChats([data, ...chats]);

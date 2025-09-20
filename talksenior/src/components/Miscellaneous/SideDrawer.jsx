@@ -16,6 +16,7 @@ import { Spinner } from '@chakra-ui/react';
 import axios from 'axios';
 import UserListItem from '../UserAvatar/UserListItem';
 import { getSender } from '../config/ChatLogics';
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const SideDrawer = () => {
         const [search, setSearch] = useState("");
@@ -99,8 +100,8 @@ const SideDrawer = () => {
               console.log("📢 Sending search request to backend...");
               console.log("🔎 Search Query:", search);
               console.log("🛠 Config Headers:", config);
-        
-              const response = await axios.get(`/api/user?search=${search}`, config);
+
+              const response = await axios.get(`${backendUrl}/api/user?search=${search}`, config);
               console.log("✅ Search Response:", response.data);  // Debugging
         
               setLoading(false);
@@ -130,7 +131,7 @@ const SideDrawer = () => {
                     Authorization: `Bearer ${user.token}`,
                   },
                 };
-                const { data } = await axios.post(`/api/chat`, { userId }, config);
+                const { data } = await axios.post(`${backendUrl}/api/chat`, { userId }, config);
           
                 if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
                 setSelectedChat(data);

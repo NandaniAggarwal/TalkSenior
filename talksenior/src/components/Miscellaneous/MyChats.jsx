@@ -9,6 +9,7 @@ import { Button } from "@chakra-ui/react";
 import { ChatState } from "../../Context/ChatProvider";
 import { getSender } from '../config/ChatLogics';
 import GroupChatModal from './GroupChatModal'
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const MyChats = ({fetchAgain,setFetchAgain}) => {
   const [loggedUser, setLoggedUser] = useState();
@@ -26,7 +27,7 @@ const MyChats = ({fetchAgain,setFetchAgain}) => {
         },
       };
 
-      const { data } = await axios.get("/api/chat", config);
+      const { data } = await axios.get(`${backendUrl}/api/chat`, config);
       setChats(data);
     } catch (error) {
       toast({

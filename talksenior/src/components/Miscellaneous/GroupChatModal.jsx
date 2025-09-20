@@ -18,7 +18,7 @@ import { Input } from '@chakra-ui/react';
 import UserBadgeItem from '../UserAvatar/UserBadgeItem';
 import axios from 'axios';
 import UserListItem from '../UserAvatar/UserListItem';
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const GroupChatModal = ({children}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,7 +60,7 @@ const GroupChatModal = ({children}) => {
         },
       };
       console.log("📢 Sending request to backend:", `/api/user?search=${query}`);
-      const response = await axios.get(`/api/user?search=${search}`, config);
+      const response = await axios.get(`${backendUrl}/api/user?search=${search}`, config);
      console.log("✅ Response Data:", response.data);
       setLoading(false);
       setSearchResult(response.data);
@@ -148,7 +148,7 @@ const GroupChatModal = ({children}) => {
       };
   
       const { data } = await axios.post(
-        `/api/chat/group`,
+        `${backendUrl}/api/chat/group`,
         {
           name: groupChatName,
           users: JSON.stringify(selectedUsers.map((u) => u._id)),

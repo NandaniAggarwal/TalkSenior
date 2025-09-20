@@ -8,6 +8,8 @@ import axios from "axios";
 import { Box } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom';
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 const Login = () => {
     const [show, setShow] = useState(false);
@@ -38,7 +40,7 @@ const Login = () => {
       };
       console.log("Sending request to backend...");
       const response = await axios.post(
-          "/api/user/login",  // Make sure this is the correct API URL
+          `${backendUrl}/api/user/login`,  // Make sure this is the correct API URL
           { email, password },
           config
       );
