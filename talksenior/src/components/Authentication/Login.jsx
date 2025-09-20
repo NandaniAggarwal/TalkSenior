@@ -20,56 +20,48 @@ const Login = () => {
     const history=useHistory();
     const { setUser } = ChatState();
   const handleClick = () => setShow(!show);
-  const submitHandler=async ()=>{
-    setLoading(true);
-    if (!email || !password) {
-      toast({
-        title: "Please Fill all the Feilds",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-      return;
-    }
-    try {
-      const config = {
-          headers: {
-              "Content-Type": "application/json",
-          },
-      };
-      const { response } = await axios.post(`${backendUrl}/api/user/login`, { email, password }, config);
-    localStorage.setItem("userInfo", JSON.stringify(response.data));
-    setUser(response.data);  // Via context or prop passed
+  const submitHandler = async () => {
+  setLoading(true);
+  if (!email || !password) {
+    toast({
+      title: "Please Fill all the Fields",
+      status: "warning",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
+    return;
+  }
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const { data } = await axios.post(`${backendUrl}/api/user/login`, { email, password }, config);
+
+    localStorage.setItem("userInfo", JSON.stringify(data));
+    setUser(data);  // Update React context
+    toast({
+      title: "Login Successful",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
     history.push("/chats");
-// Check what response you are getting
-      if (!response || !response.data) {
-          throw new Error("Invalid response from server");
-      }
-      console.log("✅ Extracted Data (response.data):", response.data);
-      toast({
-          title: "Login Successful",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-      });
-      localStorage.setItem("userInfo", JSON.stringify(response.data));
-      console.log("✅ User Info Stored in LocalStorage:", localStorage.getItem("userInfo")); // Debugging
-      setLoading(false);
-      history.push("/chats");
   } catch (error) {
-      console.error("Login error:", error);
-      toast({
-          title: "Error Occurred!",
-          description: error.response?.data?.message || "Something went wrong",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-      });
-      setLoading(false);
+    toast({
+      title: "Error Occurred!",
+      description: error.response?.data?.message || "Something went wrong",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
   }
   }
   return (
