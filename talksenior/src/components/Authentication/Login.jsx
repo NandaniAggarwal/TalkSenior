@@ -9,7 +9,7 @@ import { Box } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
+import { ChatState } from '../../Context/ChatProvider';
 
 const Login = () => {
     const [show, setShow] = useState(false);
@@ -18,6 +18,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const toast = useToast();
     const history=useHistory();
+    const { setUser } = ChatState();
   const handleClick = () => setShow(!show);
   const submitHandler=async ()=>{
     setLoading(true);
