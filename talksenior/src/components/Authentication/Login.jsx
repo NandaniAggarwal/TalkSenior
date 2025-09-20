@@ -51,6 +51,9 @@ const Login = () => {
       position: "bottom",
     });
     setLoading(false);
+    setTimeout(() => {
+      history.push("/chats");
+    }, 0);
     history.push("/chats");
   } catch (error) {
     toast({
