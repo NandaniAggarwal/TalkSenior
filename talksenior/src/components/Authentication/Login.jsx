@@ -43,6 +43,9 @@ const Login = () => {
 
     localStorage.setItem("userInfo", JSON.stringify(data));
     setUser(data);  // Update React context
+    setTimeout(() => {
+      history.push("/chats");
+    }, 0);
     toast({
       title: "Login Successful",
       status: "success",
@@ -51,10 +54,6 @@ const Login = () => {
       position: "bottom",
     });
     setLoading(false);
-    setTimeout(() => {
-      history.push("/chats");
-    }, 0);
-    history.push("/chats");
   } catch (error) {
     toast({
       title: "Error Occurred!",
