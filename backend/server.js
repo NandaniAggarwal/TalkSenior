@@ -38,7 +38,7 @@ const server=app.listen(port,()=>{
 const io= require('socket.io')(server,{
     pingTimeOut:60000,
     cors:{
-        origin: "http://localhost:5173",
+        origin: ["http://localhost:5173","https://talksenior-1.onrender.com"],
     },
 });
 
