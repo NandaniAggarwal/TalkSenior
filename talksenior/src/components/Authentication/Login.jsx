@@ -39,9 +39,9 @@ const Login = () => {
               "Content-Type": "application/json",
           },
       };
-      const { data } = await axios.post(`${backendUrl}/api/user/login`, { email, password }, config);
-    localStorage.setItem("userInfo", JSON.stringify(data));
-    setUser(data);  // Via context or prop passed
+      const { response } = await axios.post(`${backendUrl}/api/user/login`, { email, password }, config);
+    localStorage.setItem("userInfo", JSON.stringify(response.data));
+    setUser(response.data);  // Via context or prop passed
     history.push("/chats");
 // Check what response you are getting
       if (!response || !response.data) {
