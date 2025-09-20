@@ -38,14 +38,10 @@ const Login = () => {
               "Content-Type": "application/json",
           },
       };
-      console.log("Sending request to backend...");
-      const response = await axios.post(
-          `${backendUrl}/api/user/login`,  // Make sure this is the correct API URL
-          { email, password },
-          config
-      );
-      console.log("Response received:", response); 
-      console.log("✅ Full Response Received:", response); // Debugging
+      const { data } = await axios.post(`${backendUrl}/api/user/login`, { email, password }, config);
+    localStorage.setItem("userInfo", JSON.stringify(data));
+    setUser(data);  // Via context or prop passed
+    history.push("/chats");
 // Check what response you are getting
       if (!response || !response.data) {
           throw new Error("Invalid response from server");

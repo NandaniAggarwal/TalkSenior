@@ -8,12 +8,16 @@ import { useState } from "react"
 const Chatpage = () => {
   const {user}= ChatState()
   const [fetchAgain, setFetchAgain] = useState(false);
+   if (!user) {
+    // You can show spinner or loading text here
+    return <div>Loading user info...</div>;
+  }
   return (
       <div style={{ width: "100%"}}>
-      {user && <SideDrawer/>}
+      <SideDrawer/>
       <Box display="flex" justifyContent="space-between" alignItems="flex-start" w="100%" h="100vh" p="10px"  overflow="hidden">
-        {user && <MyChats fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}/>}
-        {user && <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}/>}
+        <MyChats fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}/>
+        <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}/>
       </Box>
       </div>
   )
