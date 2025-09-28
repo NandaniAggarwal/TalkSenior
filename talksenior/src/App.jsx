@@ -6,31 +6,21 @@ import Homepage from './Pages/Homepage'
 import Chatpage from './Pages/Chatpage'
 import "./index.css"
 import React, { useState, useEffect } from "react";
+import { ChatState } from './Context/ChatProvider';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-   useEffect(() => {
-    const storedUser = localStorage.getItem("userInfo");
-    if (storedUser) setUser(JSON.parse(storedUser));
-    setLoading(false);
-  }, []);
+  const { user } = ChatState(); // Context se user lo
 
-  if (loading) return <div>Loading...</div>;
   return (
-    <>
-    <div className='App'>
-    <Switch>
-      <Route exact path="/" component={Homepage} />
-        <Route path="/chats">
-          {user ? <Chatpage /> : <Redirect to="/" />}
-        </Route><Route path="/chats">
-          {user ? <Chatpage /> : <Redirect to="/" />}
-        </Route>
-    </Switch>
+    <div className="App">
+      <Switch>
+        <Route exact path="/" component={Homepage} />
+        <Route 
+          path="/chats" 
+          render={() => (user ? <Chatpage /> : <Redirect to="/" />)} 
+        />
+      </Switch>
     </div>
-    </>
-  )
+  );
 }
-
-export default App
+export default App;

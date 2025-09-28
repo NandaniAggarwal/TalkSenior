@@ -1,4 +1,3 @@
-import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { createContext, useContext, useState, useEffect } from "react";
 
 const ChatContext = createContext();
@@ -9,25 +8,20 @@ const ChatProvider = ({ children }) => {
     const [chats, setChats] = useState([]);
     const [notification, setNotification] = useState([]);
 
-    const history = useHistory();  
-        useEffect(() => {
-            const userInfo = localStorage.getItem("userInfo");
+    useEffect(() => {
+        const userInfo = localStorage.getItem("userInfo");
+        if (userInfo) {
             try {
-                if (userInfo) {
-                    setUser(JSON.parse(userInfo));
-                } else {
-                    history.push("/"); // ✅ Agar userInfo nahi mila, to login pe bhej do
-                }
+                setUser(JSON.parse(userInfo));
             } catch (error) {
                 console.error("Error parsing userInfo:", error);
                 localStorage.removeItem("userInfo");
-                history.push("/");
             }
-            
-    }, [history]);    
+        }
+    }, []);
 
     return (
-        <ChatContext.Provider value={{ user, setUser ,selectedChat,setSelectedChat,chats,setChats,notification,setNotification}}>
+        <ChatContext.Provider value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats, notification, setNotification }}>
             {children}
         </ChatContext.Provider>
     );

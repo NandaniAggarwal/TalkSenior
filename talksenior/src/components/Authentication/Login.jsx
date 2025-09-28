@@ -39,6 +39,60 @@ const Login = () => {
         "Content-Type": "application/json",
       },
     };
+    const { data } = await axios.post(
+      `${backendUrl}/api/user/login`,
+      { email, password },
+      config
+    );
+
+    localStorage.setItem("userInfo", JSON.stringify(data));
+    setUser(data);  // Update React Context immediately
+
+    toast({
+      title: "Login Successful",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+
+    setLoading(false);
+
+    setTimeout(() => {
+      history.push("/chats");
+    }, 100);
+  } catch (error) {
+    toast({
+      title: "Error Occurred!",
+      description: error.response?.data?.message || "Something went wrong",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
+  }
+};
+/*
+  const submitHandler = async () => {
+  setLoading(true);
+  if (!email || !password) {
+    toast({
+      title: "Please Fill all the Fields",
+      status: "warning",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
+    return;
+  }
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
     const { data } = await axios.post(`${backendUrl}/api/user/login`, { email, password }, config);
 
     localStorage.setItem("userInfo", JSON.stringify(data));
@@ -65,7 +119,7 @@ const Login = () => {
     });
     setLoading(false);
   }
-  }
+  }*/
   return (
     <Box
           w={{ base: "100%", md: "100%", lg: "100%" }}
