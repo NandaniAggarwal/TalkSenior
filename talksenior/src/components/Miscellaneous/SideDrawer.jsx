@@ -172,16 +172,15 @@ const SideDrawer = () => {
 
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <Tooltip label="Suggest Seniors" hasArrow placement="bottom-end">
-    <Button
-  onClick={() => {
-    if (window.innerWidth < 768) {
-      setShowSeniorFinder((prev) => !prev); 
-      setSelectedChat(null);
-    } else {
-      setShowSeniorFinder(false);
-      setSelectedChat(null);
-    }
-  }}
+    <Button onClick={() => {
+  if (window.innerWidth < 768) {
+    setShowSeniorFinder((prev) => !prev);
+    setSelectedChat(null);
+  } else {
+    setShowSeniorFinder(false); // desktop disables suggest senior
+    setSelectedChat(null);
+  }
+}}
   bg="#F5F5FA"
   color="#2D2D2D"
   _hover={{ bg: "#E3E2F3" }}

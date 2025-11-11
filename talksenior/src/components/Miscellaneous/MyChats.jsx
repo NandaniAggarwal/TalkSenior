@@ -8,7 +8,7 @@ import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./GroupChatModal";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const MyChats = ({ fetchAgain, setFetchAgain }) => {
+const MyChats = ({ fetchAgain, setFetchAgain ,showSeniorFinder}) => {
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -40,19 +40,22 @@ const MyChats = ({ fetchAgain, setFetchAgain }) => {
   return (
     <div>
       <Box
-        display={{ base: selectedChat ? "none" : "flex", md: "flex" }} // ✅ responsive display
-        flexDirection="column"
-        alignItems="center"
-        p={4}
-        bg="linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)"
-        color="black"
-        w={{ base: "100%", md: "30%" }}
-        minWidth={{ base: "100%", md: "500px" }}   
-        borderRadius="lg"
-        borderWidth="1px"
-        boxShadow="xl"
-        minHeight="88vh"
-      >
+      display={{
+        base: selectedChat || showSeniorFinder ? "none" : "flex",
+        md: "flex"
+      }}
+      flexDirection="column"
+      alignItems="center"
+      p={4}
+      bg="linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)"
+      color="black"
+      w={{ base: "100%", md: "30%" }}
+      minWidth={{ base: "100%", md: "500px" }}
+      borderRadius="lg"
+      borderWidth="1px"
+      boxShadow="xl"
+      minHeight="88vh"
+    >
         <Box
           pb={3}
           px={3}
