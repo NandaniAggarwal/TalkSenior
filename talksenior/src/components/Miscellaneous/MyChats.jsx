@@ -47,7 +47,7 @@ const MyChats = ({ fetchAgain, setFetchAgain }) => {
         bg="linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)"
         color="black"
         w={{ base: "100%", md: "30%" }}
-        minWidth="500px"
+        minWidth={{ base: "100%", md: "500px" }}   
         borderRadius="lg"
         borderWidth="1px"
         boxShadow="xl"

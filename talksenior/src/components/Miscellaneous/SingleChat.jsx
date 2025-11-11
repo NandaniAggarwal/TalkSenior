@@ -25,7 +25,7 @@ import animationData from "../../animations/typing.json";
 import { useHistory } from "react-router-dom";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = import.meta.env.VITE_BACKEND_URL;
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
