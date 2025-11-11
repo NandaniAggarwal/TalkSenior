@@ -19,12 +19,14 @@ import { getSender } from '../config/ChatLogics';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const SideDrawer = () => {
-        const [search, setSearch] = useState("");
         const [searchResult, setSearchResult] = useState([]);
         const [loading, setLoading] = useState(false);
         const [loadingChat, setLoadingChat] = useState(false);
         const{ user,setSelectedChat,chats,setChats, notification,setNotification }=ChatState();
         const { isOpen, onOpen, onClose } = useDisclosure();
+        const [search, setSearch] = useState("");
+        const [showSeniorFinder, setShowSeniorFinder] = useState(false); // 🆕 added
+
         const history=useHistory();
         const toast=useToast();
 
@@ -166,19 +168,29 @@ const SideDrawer = () => {
         TALK SENIOR
     </Text>
 
-    
+  
 
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <Tooltip label="Suggest Seniors" hasArrow placement="bottom-end">
     <Button
-      onClick={() => setSelectedChat(null)}
-      bg="#F5F5FA"
-      color="#2D2D2D"
-      _hover={{ bg: "#E3E2F3" }}
-      size="sm"
-    >
-      <Text fontSize="lg">🎓</Text>
-    </Button>
+  onClick={() => {
+    if (window.innerWidth < 768) {
+      setShowSeniorFinder((prev) => !prev); 
+      setSelectedChat(null);
+    } else {
+      setShowSeniorFinder(false);
+      setSelectedChat(null);
+    }
+  }}
+  bg="#F5F5FA"
+  color="#2D2D2D"
+  _hover={{ bg: "#E3E2F3" }}
+  size="sm"
+>
+  <Text fontSize="lg">🎓</Text>
+</Button>
+
+
   </Tooltip>
         <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}

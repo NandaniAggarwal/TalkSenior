@@ -1,9 +1,18 @@
-import React from 'react'
-import { Container,Box,Text,Button , Tabs,TabList,TabPanel,TabPanels,Tab} from '@chakra-ui/react'
-import Login from '../components/Authentication/Login'
-import Signup from '../components/Authentication/Signup'
-import { useHistory } from 'react-router-dom/cjs/react-router-dom'
-import { useEffect } from 'react'
+import React, { useEffect } from "react";
+import {
+  Container,
+  Box,
+  Text,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+} from "@chakra-ui/react";
+import Login from "../components/Authentication/Login";
+import Signup from "../components/Authentication/Signup";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Homepage = () => {
@@ -15,89 +24,123 @@ const Homepage = () => {
   }, [history]);
 
   return (
-    <Container display="flex" 
-    alignItems="center" 
-    justifyContent="center"
-    minH='100vh'
-    maxW="container.xl"
+    <Container
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      minH="100vh"
+      maxW="container.xl"
+      px={{ base: 4, md: 10 }}
+      bgGradient="linear(to-b, #2B1055, #7597DE)" // 👈 full-page purple gradient
+      overflowY="auto"
     >
+      <Box
+        justify="center"
+        align="center"
+        minH="100vh"
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-start"
+        alignItems="center"
+        p={{ base: 6, md: 10 }}
+        bg="rgba(255, 255, 255, 0.15)"
+        backdropFilter="blur(10px)"
+        border="1px solid rgba(255, 255, 255, 0.2)"
+        color="#F8F9FA"
+        w={{ base: "100%", md: "90%" }}
+        borderRadius="lg"
+        boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
+        m="20px auto"
+      >
+        <Text
+          fontSize={{ base: "3xl", md: "5xl", lg: "6xl" }}
+          fontWeight="extrabold"
+          fontFamily="Work sans"
+          letterSpacing="wide"
+          textTransform="uppercase"
+          color="rgba(255, 255, 255, 0.9)"
+          textShadow="3px 3px 15px rgba(255, 255, 255, 0.7)"
+          textAlign="center"
+          mb={{ base: 6, md: 8 }}
+        >
+          TALK-SENIOR
+        </Text>
+
         <Box
-          justify="center"
-          align="center"
-          h="100vh"
+          display="flex"
+          flexDirection={{ base: "column", md: "row" }}
+          w="100%"
+          alignItems="center"
+          justifyContent="center"
+          gap={{ base: 6, md: 8 }}
+        >
+          {/* Left Side - Logo */}
+          <Box
+            w={{ base: "60%", md: "30%" }}
+            mb={{ base: 6, md: 0 }}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <img
+              src="logo.webp"
+              alt="logo"
+              width="100%"
+              height="auto"
+              style={{ maxWidth: "220px" }}
+            />
+          </Box>
+
+          {/* Right Side - Login & Signup */}
+          <Box
             display="flex"
             flexDirection="column"
-            justifyContent="flex-start"
             alignItems="center"
-            p={10}
-            bg="rgba(255, 255, 255, 0.15)"  // Transparent White
-            backdropFilter="blur(10px)"
-            border="1px solid rgba(255, 255, 255, 0.2)"
-            color="#F8F9FA"
-            w="90%"
-            borderRadius="lg"
-            borderWidth="1px"
-            boxShadow="0 4px 30px rgba(0, 0, 0, 0.1)"
-            m="20px auto"
-            mb="20px"
-        ><Text
-        fontSize={{ base: "4xl", md: "5xl", lg: "6xl", xl: "7xl" }} // Increased Size
-        fontWeight="extrabold"
-        fontFamily="Work sans"
-        letterSpacing="wide"
-        textTransform="uppercase"
-        color="rgba(255, 255, 255, 0.9)"  // Light White
-        textShadow="3px 3px 15px rgba(255, 255, 255, 0.7)" // Strong Glow Effect
-      >
-        TALK-SENIOR
-      </Text>      
-      
-
-        <Box display="flex" w="100%" h="100%" alignItems="center">
-    {/* Left Side - Large Logo */}
-    <Box w="30%" display="flex" justifyContent="center" alignItems="center">
-      <img src="logo.webp" alt="logo" width="90%" height="auto" />
-    </Box>
-
-    {/* Right Side - Login & Signup */}
-    <Box display="flex" flexDirection="column" alignItems="center" w="70%">
-    <Tabs isFitted variant="soft-rounded" w="100%">
-    <TabList bg="gray.800" p="3" borderRadius="lg">
-    <Tab 
-      _selected={{ bg: "#6A5ACD", color: "white" ,border: "none",  // Remove outline effect
-        boxShadow: "0px 0px 10px rgba(106, 90, 205, 0.8)", borderRadius: "10px",transition: "all 0.3s ease-in-out"}}  // Selected tab
-      _hover={{ bg: "#836FFF", color: "white",borderRadius: "10px",transform: "scale(1.05)" }}  // Hover effect
-      color="#B3A7FF"  // Default text color
-      fontSize="lg"
-      px="8"
-    >
-      Login
-    </Tab>
-    <Tab 
-     _selected={{ bg: "#6A5ACD", color: "white", border: "none",  // Remove outline effect
-      boxShadow: "0px 0px 10px rgba(106, 90, 205, 0.8)", borderRadius: "10px", transition: "all 0.3s ease-in-out"}}  // Selected tab
-     _hover={{ bg: "#836FFF", color: "white" ,borderRadius: "10px", transform: "scale(1.05)"}}  // Hover effect
-     color="#B3A7FF"  // Default text color
-      fontSize="lg"
-      px="8"
-    >
-      Sign Up
-    </Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <Login />
-            </TabPanel>
-            <TabPanel>
-              <Signup />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-    </Box>
-  </Box>
+            w={{ base: "100%", md: "70%" }}
+          >
+            <Tabs isFitted variant="soft-rounded" w={{ base: "100%", md: "80%" }}>
+              <TabList bg="gray.800" p={{ base: 2, md: 3 }} borderRadius="lg">
+                <Tab
+                  _selected={{
+                    bg: "#6A5ACD",
+                    color: "white",
+                    borderRadius: "10px",
+                    boxShadow: "0px 0px 10px rgba(106, 90, 205, 0.8)",
+                  }}
+                  _hover={{ bg: "#836FFF", transform: "scale(1.05)" }}
+                  color="#B3A7FF"
+                  fontSize={{ base: "md", md: "lg" }}
+                >
+                  Login
+                </Tab>
+                <Tab
+                  _selected={{
+                    bg: "#6A5ACD",
+                    color: "white",
+                    borderRadius: "10px",
+                    boxShadow: "0px 0px 10px rgba(106, 90, 205, 0.8)",
+                  }}
+                  _hover={{ bg: "#836FFF", transform: "scale(1.05)" }}
+                  color="#B3A7FF"
+                  fontSize={{ base: "md", md: "lg" }}
+                >
+                  Sign Up
+                </Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <Login />
+                </TabPanel>
+                <TabPanel>
+                  <Signup />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Box>
+        </Box>
       </Box>
     </Container>
-  )
-}
+  );
+};
 
-export default Homepage
+export default Homepage;
