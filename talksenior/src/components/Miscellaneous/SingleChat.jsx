@@ -238,7 +238,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
               </>
             )}
           </Text>
-
           <Box
             display="flex"
             flexDir="column"
@@ -246,9 +245,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
             p={3}
             bg="#E8E8E8"
             w="100%"
-            maxHeight="78vh"
+            h="74vh"
             borderRadius="lg"
-            overflowY="hidden"
+            overflowY="auto"
             sx={{
               "::-webkit-scrollbar": { width: "6px" },
               "::-webkit-scrollbar-thumb": {
