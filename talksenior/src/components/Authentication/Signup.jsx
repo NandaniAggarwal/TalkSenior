@@ -61,7 +61,7 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
-      localStorage.setItem("userInfo", JSON.stringify(data.data));
+      localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
       history.push("/chats");
     } catch (error) {
@@ -203,6 +203,7 @@ const Signup = () => {
             w="100%"
           >
             <Select
+              style={{ color: "black" }}
               placeholder="Select Branch"
               size={{ base: "md", md: "sm" }}
               w="100%"
@@ -210,27 +211,28 @@ const Signup = () => {
               focusBorderColor="white"
               onChange={(e) => setBranch(e.target.value)}
             >
-              <option value="CSE-AI">CSE-AI</option>
-              <option value="CSE">CSE</option>
-              <option value="IT">IT</option>
-              <option value="ECE-AI">ECE-AI</option>
-              <option value="ECE">ECE</option>
-              <option value="MECH">MECH</option>
+              <option value="CSE-AI" style={{ color: "black" }}>CSE-AI</option>
+              <option value="CSE" style={{ color: "black" }}>CSE</option>
+              <option value="IT" style={{ color: "black" }}>IT</option>
+              <option value="ECE-AI" style={{ color: "black" }}>ECE-AI</option>
+              <option value="ECE" style={{ color: "black" }}>ECE</option>
+              <option value="MECH" style={{ color: "black" }}>MECH</option>
             </Select>
 
             <Select
               placeholder="Select Year"
+              style={{ color: "black" }}
               size={{ base: "md", md: "sm" }}
               w="100%"
               borderColor="gray.300"
               focusBorderColor="white"
               onChange={(e) => setYear(e.target.value)}
             >
-              <option value="1st">1st Year</option>
-              <option value="2nd">2nd Year</option>
-              <option value="3rd">3rd Year</option>
-              <option value="4th">4th Year</option>
-              <option value="alumni">Alumni</option>
+              <option value="1st" style={{ color: "black" }}>1st Year</option>
+              <option value="2nd" style={{ color: "black" }}>2nd Year</option>
+              <option value="3rd" style={{ color: "black" }}>3rd Year</option>
+              <option value="4th" style={{ color: "black" }}>4th Year</option>
+              <option value="alumni"style={{ color: "black" }}>Alumni</option>
             </Select>
           </HStack>
         </FormControl>
@@ -239,10 +241,10 @@ const Signup = () => {
           <FormLabel fontSize="sm" color="black">
             Topics You Can Guide On
           </FormLabel>
-          <Input
+          <Input style={{ color: "black" }}
             size={{ base: "md", md: "sm" }}
             placeholder="e.g. DSA, ML, Open Source"
-            _placeholder={{ color: "#B3A7FF" }}
+            _placeholder={{ color: "#0b0913ff" }}
             borderColor="gray.300"
             focusBorderColor="white"
             onChange={(e) =>

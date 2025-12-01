@@ -95,19 +95,16 @@ const SuggestSenior = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
     });
   });
 
-  const handleFindSeniors = async () => {
-    if (!selectedYear || !needHelpTopic) {
-      alert("Please select year and enter topic.");
-      return;
-    }
-    try {
-      const { data } = await axios.get(
-        `${backendUrl}/api/user/seniors?year=${selectedYear}&topic=${needHelpTopic}`
-      );
-      setRecommendedSeniors(data);
-    } catch (err) {
-      console.error("Error fetching seniors:", err);
-    }
+const handleFindSeniors = async () => { 
+  if (!selectedYear || !needHelpTopic) { 
+    alert("Please select year and enter topic."); 
+    return; 
+  } 
+  try { 
+    const { data } = await axios.get( `${backendUrl}/api/user/seniors?year=${selectedYear}&topic=${needHelpTopic}` ); 
+    setRecommendedSeniors(data); 
+  } catch (err) { 
+    console.error("Error fetching seniors:", err); } 
   };
 
   const accessChat = async (userId) => {
@@ -149,7 +146,7 @@ const SuggestSenior = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
           bg="#adadcaff"
         >
           <Text fontSize="3xl" fontWeight="bold" color="#2D2D2D" fontFamily="Work Sans">
-            Which year would you like to talk to?
+            Which year senior would you like to connect with?
           </Text>
 
           <Select
@@ -166,7 +163,7 @@ const SuggestSenior = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
             <option value="2nd">2nd Year</option>
             <option value="3rd">3rd Year</option>
             <option value="4th">4th Year</option>
-            <option value="alumni">Alumni</option>
+            <option value="alumini">Alumni</option>
           </Select>
 
           <Input

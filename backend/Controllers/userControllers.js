@@ -27,22 +27,6 @@ const allUsers = asyncHandler(async (req, res) => {
   }
 });
 
-/*
-const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
-    : {};
-
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-  res.send(users);
-});
-// i is for case sensitive and ne is for not equals to and regex is for matching the pattern 
-*/
 const registeredUser=asyncHandler(async (req,res)=>{
       const {name,email,password,pic,branch,year,canGuide}=req.body;
       if (!name || !email || !password || !branch || !year) {
@@ -101,13 +85,28 @@ const getRecommendedSeniors = asyncHandler(async (req, res) => {
     throw new Error("Please provide year and topic");
   }
 
-  const seniors = await User.find({
-    year: year,
-    canGuide: { $in: [topic] },
-  }).select("-password"); // remove password for safety
+  // Fetch all seniors once
+  const seniors = await User.find({ canGuide: { $in: [topic] } })
+    .select("-password");
 
-  res.json(seniors);
+  // Priority sorting
+  const sorted = seniors.sort((a, b) => {
+    let scoreA = 0;
+    let scoreB = 0;
+
+    // interest match (same for both since already filtered)
+    scoreA += 2;
+    scoreB += 2;
+
+    // year match gives extra score
+    if (a.year == year) scoreA += 3;
+    if (b.year == year) scoreB += 3;
+
+    return scoreB - scoreA; // higher score first
+  });
+
+  // take only top 3
+  res.json(sorted.slice(0, 3));
 });
 
-  
 module.exports={registeredUser,authUser,allUsers,getRecommendedSeniors};
