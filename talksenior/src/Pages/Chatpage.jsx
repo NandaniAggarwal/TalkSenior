@@ -21,14 +21,14 @@ const Chatpage = () => {
     <div style={{ width: "100%" }}>
       <SideDrawer setShowSeniorFinder={setShowSeniorFinder} />
       <Box
-  display="flex"
-  flexDirection={{ base: "column", md: "row" }} // Row on desktop, column on mobile
-  alignItems="stretch"
-  justifyContent="flex-start"
-  w="100vw"
-  minH="100vh"
-  p={0}
->
+        display="flex"
+        flexDirection={{ base: "column", md: "row" }} // Row on desktop, column on mobile
+        alignItems="stretch"
+        justifyContent="flex-start"
+        w="100vw"
+        minH="100vh"
+        p={0}
+        >
   {/* Sidebar: fixed width and gap */}
   <Box
     w={{ base: "100%", md: "330px" }}  // Fixed desktop width, full width on mobile
@@ -46,7 +46,7 @@ const Chatpage = () => {
   <Box
     flex={1}
     h="100%"
-    minWidth={0}
+    minWidth={0}// Allow shrinking on desktop
     display="flex"
     justifyContent="center"
     alignItems="flex-start"
