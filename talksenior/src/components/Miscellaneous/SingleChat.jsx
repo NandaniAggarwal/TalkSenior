@@ -204,12 +204,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
   };
 
   return (
-    <div>
+    <div >
       {selectedChat ? (
         <>
           <Text
             fontSize={{ base: "28px", md: "30px" }}
-            pb={3}
+            pb={0}
             px={2}
             w="100%"
             fontFamily="Work sans"

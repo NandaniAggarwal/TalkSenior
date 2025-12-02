@@ -26,7 +26,7 @@ const Chatpage = () => {
   alignItems="stretch"
   justifyContent="flex-start"
   w="100vw"
-  h="100vh"
+  minH="100vh"
   p={0}
 >
   {/* Sidebar: fixed width and gap */}
