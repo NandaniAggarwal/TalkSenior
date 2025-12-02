@@ -243,8 +243,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
             flexDir="column"
             justifyContent="flex-end"
             p={3}
-            bg="#E8E8E8"
-            w="100%"
+            bg="linear-gradient(135deg, #dac3e8, #d2b7e5, #b8c0ff)"
+            w="99%"
             h="74vh"
             borderRadius="lg"
             overflowY="auto"

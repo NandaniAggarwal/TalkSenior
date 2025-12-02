@@ -32,50 +32,68 @@ const Signup = () => {
 
   const handleClick = () => setShow(!show);
 
-  const submitHandler = async () => {
-    setLoading(true);
-    if (!name || !email || !password || !branch || !year) {
-      toast({
-        title: "Please fill all the fields",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const config = { headers: { "Content-type": "application/json" } };
-      const { data } = await axios.post(
-        `${backendUrl}/api/user`,
-        { name, email, password, pic, branch, year, canGuide },
-        config
-      );
-
-      toast({
-        title: "Registration Successful",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setLoading(false);
-      history.push("/chats");
-    } catch (error) {
-      toast({
-        title: "Error Occurred!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-    }
+  const isCollegeEmail = (email) => {
+    return email.toLowerCase().endsWith("@igdtuw.ac.in");
   };
+  const submitHandler = async () => {
+  setLoading(true);
+
+  if (!name || !email || !password || !branch || !year) {
+    toast({
+      title: "Please fill all the fields",
+      status: "warning",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
+    return;
+  }
+
+  // 🔥 College email validation here
+  if (!isCollegeEmail(email)) {
+    toast({
+      title: "Invalid Email",
+      description: "Please use your IGDTUW college email ID (example: abc@igdtuw.ac.in)",
+      status: "error",
+      duration: 4000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const config = { headers: { "Content-type": "application/json" } };
+    const { data } = await axios.post(
+      `${backendUrl}/api/user`,
+      { name, email, password, pic, branch, year, canGuide },
+      config
+    );
+
+    toast({
+      title: "Registration Successful",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    localStorage.setItem("userInfo", JSON.stringify(data));
+    setLoading(false);
+    history.push("/chats");
+  } catch (error) {
+    toast({
+      title: "Error Occurred!",
+      description: error.response.data.message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    setLoading(false);
+  }
+};
 
   const postDetails = (pics) => {
     setLoading(true);
@@ -138,7 +156,7 @@ const Signup = () => {
 
         <FormControl id="email" isRequired>
           <FormLabel fontSize="sm" color="black">
-            Email Address
+            Email Address (College Email Only)
           </FormLabel>
           <Input
             size={{ base: "md", md: "sm" }}
