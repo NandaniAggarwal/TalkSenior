@@ -144,6 +144,7 @@ const handleFindSeniors = async () => {
           gap={5}
           px={4}
           bg="#adadcaff"
+          overflow="hidden"
         >
           <Text fontSize="3xl" fontWeight="bold" color="#2D2D2D" fontFamily="Work Sans">
             Which year senior would you like to connect with?
@@ -192,7 +193,7 @@ const handleFindSeniors = async () => {
 
           <Box
             mt={8}
-            maxH="50vh"
+            height="46vh"      // Fixed height for scrolling
             overflowY="auto"
             w="100%"
             maxW="600px"

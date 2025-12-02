@@ -85,28 +85,29 @@ const getRecommendedSeniors = asyncHandler(async (req, res) => {
     throw new Error("Please provide year and topic");
   }
 
-  // Fetch all seniors once
-  const seniors = await User.find({ canGuide: { $in: [topic] } })
-    .select("-password");
+  // 🟣 Normalize case
+  const normalizedTopic = topic.toUpperCase();
+  const normalizedYear = year.toLowerCase(); // (optional, if your DB stores lower case)
 
-  // Priority sorting
+  // 🟣 Fetch seniors (case-insensitive match)
+  const seniors = await User.find({
+    canGuide: { $in: [normalizedTopic] }   // both sides upper-case now
+  }).select("-password");
+
+  // 🟣 Score & sort
   const sorted = seniors.sort((a, b) => {
-    let scoreA = 0;
-    let scoreB = 0;
+    let scoreA = 2;
+    let scoreB = 2;
 
-    // interest match (same for both since already filtered)
-    scoreA += 2;
-    scoreB += 2;
+    if (a.year.toLowerCase() === normalizedYear) scoreA += 3;
+    if (b.year.toLowerCase() === normalizedYear) scoreB += 3;
 
-    // year match gives extra score
-    if (a.year == year) scoreA += 3;
-    if (b.year == year) scoreB += 3;
-
-    return scoreB - scoreA; // higher score first
+    return scoreB - scoreA;
   });
 
-  // take only top 3
+  // 🟣 Return top 3
   res.json(sorted.slice(0, 3));
 });
+
 
 module.exports={registeredUser,authUser,allUsers,getRecommendedSeniors};
