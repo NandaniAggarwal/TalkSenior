@@ -65,6 +65,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
       setMessages(data);
       setLoading(false);
       socket.emit("join chat", selectedChat._id);
+      window.socket.emit("mark read", {
+      chatId: selectedChat._id,
+      userId: user._id,
+    });
+      setFetchAgain(!fetchAgain);
     } catch (error) {
       console.log(error);
       toast({
@@ -115,6 +120,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
 
   useEffect(() => {
     socket = io(ENDPOINT);
+    window.socket = socket; 
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
@@ -141,6 +147,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
       }
     });
   });
+
+ useEffect(() => {
+  if (!selectedChat) return;
+
+  // ⭐ JAB CHAT KHOLO → MARK AS READ ⭐
+  socket.emit("mark read", {
+    chatId: selectedChat._id,
+    userId: user._id,
+  });
+
+}, [selectedChat, messages]); // messages bhi rakho taki new msg pe read ho jaye
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);

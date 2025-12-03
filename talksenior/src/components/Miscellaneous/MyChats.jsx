@@ -17,7 +17,18 @@ const MyChats = ({ fetchAgain, setFetchAgain ,showSeniorFinder}) => {
     try {
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       const { data } = await axios.get(`${backendUrl}/api/chat`, config);
-      setChats(data);
+
+      const updated = data.map((chat) => {
+  const arr = chat.latestMessage?.unreadBy || [];
+  const hasUnreadForMe = arr.some((u) => {
+    if (!u) return false;
+    if (typeof u === "string") return u === user._id;
+    if (u._id) return u._id.toString() === user._id;
+    return u.toString() === user._id;
+  });
+  return { ...chat, unreadCount: hasUnreadForMe ? 1 : 0 };
+});
+      setChats(updated);
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -36,6 +47,18 @@ const MyChats = ({ fetchAgain, setFetchAgain ,showSeniorFinder}) => {
 
     if (storedUser?.token) fetchChats();
   }, [fetchAgain]);
+
+  useEffect(() => {
+  if (!window.socket) return;
+
+  window.socket.on("messages read", ({ chatId }) => {
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
+      )
+    );
+  });
+}, []);
 
   return (
     <div>
@@ -129,11 +152,29 @@ const MyChats = ({ fetchAgain, setFetchAgain ,showSeniorFinder}) => {
                   width="100%"
                   textAlign="left"
                 >
-                  <Text fontSize="md" fontWeight="bold">
-                    {!chat.isGroupChat
-                      ? getSender(loggedUser, chat.users)
-                      : chat.chatName}
-                  </Text>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+  {/* Chat name */}
+  <Text fontSize="md" fontWeight="bold">
+    {!chat.isGroupChat
+      ? getSender(loggedUser, chat.users)
+      : chat.chatName}
+  </Text>
+
+  {/* 🔥 UNREAD BADGE */}
+  {chat.unreadCount > 0 && (
+  <span
+    style={{
+      width: "10px",
+      height: "10px",
+      backgroundColor: "red",
+      borderRadius: "50%",
+      display: "inline-block",
+    }}
+  ></span>
+)}
+
+</Box>
+
                 </Box>
               ))}
             </Stack>

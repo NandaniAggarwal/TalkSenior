@@ -1,5 +1,5 @@
 import React from 'react'
-import {useState} from "react";
+import {useState,useEffect} from "react";
 import { Avatar, MenuList, Tooltip, useDisclosure, useToast } from '@chakra-ui/react';
 import { Box } from '@chakra-ui/react';
 import { ChatState } from '../../Context/ChatProvider';
@@ -18,6 +18,7 @@ import UserListItem from '../UserAvatar/UserListItem';
 import { getSender } from '../config/ChatLogics';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+
 const SideDrawer = () => {
         const [searchResult, setSearchResult] = useState([]);
         const [loading, setLoading] = useState(false);
@@ -25,10 +26,50 @@ const SideDrawer = () => {
         const{ user,setSelectedChat,chats,setChats, notification,setNotification }=ChatState();
         const { isOpen, onOpen, onClose } = useDisclosure();
         const [search, setSearch] = useState("");
+        const [allUsers, setAllUsers] = useState([]);
         const [showSeniorFinder, setShowSeniorFinder] = useState(false); // 🆕 added
 
         const history=useHistory();
         const toast=useToast();
+
+        useEffect(() => {
+    const fetchAllUsers = async () => {
+      if (!isOpen) return;
+
+      try {
+        setLoading(true);
+        const config = {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        };
+        const { data } = await axios.get(`${backendUrl}/api/user`, config);
+        setAllUsers(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("❌ Failed to load users", error);
+        toast({
+          title: "Error fetching users",
+          description: error.response?.data?.message || "Failed to load users",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        setLoading(false);
+      }
+    };
+
+    fetchAllUsers();
+  }, [isOpen, user?.token, toast]);
+
+
+        useEffect(() => {
+  const delayDebounce = setTimeout(() => {
+    if (search) {
+      handleSearch();
+    }
+  }, 500); // wait 500ms after user stops typing
+
+  return () => clearTimeout(delayDebounce); // cleanup previous timeout
+}, [search]);
 
 
         const logoutHandler = () => {
@@ -226,7 +267,7 @@ const SideDrawer = () => {
             {loading ? (
                 <ChatLoading />
             ) : (
-                searchResult?.map((user) => (
+              (search ? searchResult : allUsers)?.map((user) => (
                   <Box key={user._id} 
          bg="#F0F0FF"  // Light pastel background
          p={3} 
@@ -239,7 +280,7 @@ const SideDrawer = () => {
         <UserListItem user={user} />
     </Box>
                 ))
-            )}
+      )}
             {loadingChat && <Spinner ml="auto" display="flex" />}
         </DrawerBody>
     </DrawerContent>

@@ -68,6 +68,10 @@ socket.on("new message", (newMessageRecieved) => {
     });
   });
 
+socket.on("mark read", ({ chatId, userId }) => {
+    socket.in(chatId).emit("messages read", { chatId, userId });
+});
+
 socket.off("setup", () => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);

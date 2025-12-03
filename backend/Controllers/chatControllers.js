@@ -25,6 +25,7 @@ const accessChat=asyncHandler(async(req,res)=>{
       });
     
       if (isChat.length > 0) {
+        await Chat.findByIdAndUpdate(isChat[0]._id, { updatedAt: Date.now() });
         res.send(isChat[0]);
       } else {
         var chatData = {
@@ -47,24 +48,30 @@ const accessChat=asyncHandler(async(req,res)=>{
       }
 });
 
-const fetchChats=asyncHandler(async(req,res)=>{
-    try {
-        Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-          .populate("users", "-password")
-          .populate("groupAdmin", "-password")
-          .populate("latestMessage")
-          .sort({ updatedAt: -1 })
-          .then(async (results) => {
-            results = await User.populate(results, {
-              path: "latestMessage.sender",
-              select: "name pic email",
-            });
-            res.status(200).send(results);
-          });
-      } catch (error) {
-        res.status(400);
-        throw new Error(error.message);
-      }
+const fetchChats = asyncHandler(async(req,res)=>{
+  try {
+    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password")
+      .populate({
+        path: "latestMessage",
+        populate: {
+          path: "unreadBy",
+          select: "_id name pic"
+        }
+      })
+      .sort({ updatedAt: -1 })
+      .then(async (results) => {
+        results = await User.populate(results, {
+          path: "latestMessage.sender",
+          select: "name pic email",
+        });
+        res.status(200).send(results);
+      });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
 });
 
 const createGroupChat=asyncHandler(async(req,res)=>{
