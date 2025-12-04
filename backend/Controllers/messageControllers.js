@@ -84,4 +84,5 @@ const markAsRead = asyncHandler(async (req, res) => {
   res.json({ success: true });
 });
 
+
 module.exports={sendMessage,allMessages, markAsRead};

@@ -39,6 +39,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
   const [selectedYear, setSelectedYear] = useState("");
   const [needHelpTopic, setNeedHelpTopic] = useState("");
   const [recommendedSeniors, setRecommendedSeniors] = useState([]);
+
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -86,6 +87,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage.trim()) {
       socket.emit("stop typing", selectedChat._id);
+  
       try {
         const config = {
           headers: {
@@ -94,6 +96,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
           },
         };
         setNewMessage("");
+
         const { data } = await axios.post(
           `${backendUrl}/api/message`,
           {
@@ -104,6 +107,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
         );
         socket.emit("new message", data);
         setMessages([...messages, data]);
+
+
       } catch (error) {
         console.error(error);
         toast({
@@ -158,6 +163,26 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
   });
 
 }, [selectedChat, messages]); // messages bhi rakho taki new msg pe read ho jaye
+
+useEffect(() => {
+  if (!socket) return;
+
+  socket.on("messages read", ({ chatId, userId }) => {
+    // Check current chat
+    if (selectedChat && selectedChat._id === chatId) {
+      
+      // Update messages state => unreadBy remove
+      setMessages(prev =>
+        prev.map(msg => ({
+          ...msg,
+          unreadBy: msg.unreadBy?.filter(id => id !== userId)
+        }))
+      );
+    }
+  });
+
+  return () => socket.off("messages read");
+}, [selectedChat, socket]);
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -290,6 +315,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
                   />
                 </div>
               ) : null}
+
               <Input
                 variant="filled"
                 bg="#E0E0E0"

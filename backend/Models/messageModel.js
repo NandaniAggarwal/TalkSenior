@@ -8,7 +8,7 @@ const messageSchema= mongoose.Schema({
     },
     unreadBy: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User" }
-    ],
+    ]
   },
   { timestamps: true }
 );
