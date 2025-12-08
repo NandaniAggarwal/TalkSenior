@@ -4,7 +4,8 @@ const messageSchema= mongoose.Schema({
     sender:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
     content:{type:String,trim:true},
     chat:{
-        type:mongoose.Schema.Types.ObjectId,ref:"Chat"
+        type:mongoose.Schema.Types.ObjectId,ref:"Chat",
+        index: true,
     },
     unreadBy: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User" }
@@ -12,6 +13,8 @@ const messageSchema= mongoose.Schema({
   },
   { timestamps: true }
 );
+
+messageSchema.index({ chat: 1, createdAt: -1 });
 
 const Message= mongoose.model("Message",messageSchema);
 module.exports=Message;

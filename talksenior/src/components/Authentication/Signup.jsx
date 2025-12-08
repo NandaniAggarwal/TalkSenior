@@ -35,6 +35,7 @@ const Signup = () => {
   const isCollegeEmail = (email) => {
     return email.toLowerCase().endsWith("@igdtuw.ac.in");
   };
+  
   const submitHandler = async () => {
   setLoading(true);
 

@@ -6,6 +6,7 @@ const chatSchema= mongoose.Schema({
     users:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
+        index: true,
     }],
     latestMessage:{
         type:mongoose.Schema.Types.ObjectId,
@@ -19,6 +20,7 @@ const chatSchema= mongoose.Schema({
     timestamps:true,
 });
 
+chatSchema.index({ users: 1, updatedAt: -1 });
 
 const Chat= mongoose.model("Chat",chatSchema);
 module.exports=Chat;
