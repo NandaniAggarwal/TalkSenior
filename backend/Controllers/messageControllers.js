@@ -2,6 +2,7 @@ const asyncHandler=require('express-async-handler');
 const Message= require('../Models/messageModel');
 const User=require('../Models/userModel');
 const Chat=require('../Models/chatModel');
+const sanitize= require('../config/sanitize');
 
 const allMessages = asyncHandler(async (req, res) => {
   try {
@@ -26,7 +27,8 @@ const allMessages = asyncHandler(async (req, res) => {
 });
 
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId } = req.body;
+  let { content, chatId } = req.body;
+  content = sanitize(content);
 
   if (!content || !chatId) return res.sendStatus(400);
 

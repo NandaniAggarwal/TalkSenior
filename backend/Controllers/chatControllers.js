@@ -1,10 +1,11 @@
 const asyncHandler=require('express-async-handler');
 const User=require('../Models/userModel');
 const Chat=require('../Models/chatModel');
+const sanitize = require('../config/sanitize');
 
 const accessChat = asyncHandler(async(req,res)=>{
-  const { userId } = req.body;
-
+  let { userId } = req.body;
+  userId = sanitize(userId);
   if (!userId) return res.sendStatus(400);
 
   // 🔥 FAST lookup (indexed)
@@ -65,7 +66,7 @@ const createGroupChat=asyncHandler(async(req,res)=>{
     if (!req.body.users || !req.body.name) {
         return res.status(400).send({ message: "Please Fill all the feilds" });
       }
-    
+      
       var users = JSON.parse(req.body.users);
     
       if (users.length < 2) {
@@ -78,7 +79,7 @@ const createGroupChat=asyncHandler(async(req,res)=>{
     
       try {
         const groupChat = await Chat.create({
-          chatName: req.body.name,
+          chatName: content = sanitize(req.body.name),
           users: users,
           isGroupChat: true,
           groupAdmin: [req.user._id],
@@ -100,7 +101,7 @@ const renameGroup = asyncHandler(async (req, res) => {
 
   const updatedChat = await Chat.findByIdAndUpdate(
     chatId,
-    { chatName },
+    { chatName: sanitize(chatName) },
     { new: true } // ✅ Ensures the updated chat is returned
   )
     .populate("users", "-password")

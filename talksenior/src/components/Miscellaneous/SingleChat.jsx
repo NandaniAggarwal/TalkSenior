@@ -24,10 +24,13 @@ import Lottie from "react-lottie";
 import animationData from "../../animations/typing.json";
 import { useHistory } from "react-router-dom";
 import SuggestSenior from "./SuggestSenior";
+import DOMPurify from "dompurify";
+
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const ENDPOINT = import.meta.env.VITE_BACKEND_URL;
 var socket, selectedChatCompare;
+
 
 const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
   const [messages, setMessages] = useState([]);
@@ -52,6 +55,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
     ChatState();
   const history = useHistory();
   const { chats, setChats } = ChatState();
+  // ===== SANITIZE USER INPUT (protect from XSS) =====
+const sanitizeInput = (dirty) => {
+  return DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: []
+  });
+};
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -100,7 +110,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
         const { data } = await axios.post(
           `${backendUrl}/api/message`,
           {
-            content: newMessage,
+            content: sanitizeInput(newMessage),
             chatId: selectedChat._id,
           },
           config
@@ -185,7 +195,8 @@ useEffect(() => {
 }, [selectedChat, socket]);
 
   const typingHandler = (e) => {
-    setNewMessage(e.target.value);
+    const clean = sanitizeInput(e.target.value);
+    setNewMessage(clean);
     if (!socketConnected) return;
 
     if (!typing) {
