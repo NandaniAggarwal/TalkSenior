@@ -2,6 +2,22 @@ const asyncHandler=require('express-async-handler');
 const User=require('../Models/userModel')
 const generateToken=require('../config/generateToken')
 
+const topicSynonyms = {
+  dsa: ["dsa", "data structure", "data structures", "algorithms", "problem solving"],
+  "data structure": ["dsa", "data structure", "data structures", "algorithms"],
+  "data structures": ["dsa", "data structure", "data structures", "algorithms"],
+  algorithms: ["dsa", "data structure", "data structures", "algorithms"],  // <-- ADD THIS
+
+  ml: ["ml", "machine learning", "ai", "deep learning", "neural networks"],
+  "machine learning": ["ml", "machine learning", "ai", "deep learning"],
+
+  cp: ["cp", "competitive programming", "coding", "contests", "codeforces"],
+  "competitive programming": ["cp", "competitive programming", "coding"],
+
+  iot: ["internet of things", "hardware", "sensors"],
+};
+
+
 const allUsers = asyncHandler(async (req, res) => {
   console.log("🔍 Backend Received Search Query:", req.query.search);
   console.log("🛠 Authenticated User:", req.user);
@@ -77,6 +93,7 @@ const authUser = asyncHandler(async (req, res) => {
       }
 });
 
+/*
 const getRecommendedSeniors = asyncHandler(async (req, res) => {
   const { year, topic } = req.query;
 
@@ -107,6 +124,49 @@ const getRecommendedSeniors = asyncHandler(async (req, res) => {
 
   // 🟣 Return top 3
   res.json(sorted.slice(0, 3));
+});
+*/
+
+const getRecommendedSeniors = asyncHandler(async (req, res) => {
+  const { year, topic } = req.query;
+
+  if (!year || !topic) {
+    return res.status(400).json({ message: "Please provide year and topic" });
+  }
+  const query = topic.toLowerCase();
+  const expandedQueries = topicSynonyms[query] || [query];
+
+  try {
+    const seniors = await User.aggregate([
+      {
+        $search: {
+          index: "default",
+          text: {
+            query: expandedQueries,
+            path: ["canGuide", "name", "branch"]
+          }
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          branch: 1,
+          year: 1,
+          pic: 1,
+          canGuide: 1,
+          score: { $meta: "searchScore" }
+        }
+      },
+      { $sort: { score: -1 } },
+      { $limit: 3 }
+    ]);
+
+    res.json(seniors);
+  } catch (error) {
+    console.error("🔍 Search Error:", error);
+    res.status(500).json({ message: "Error fetching seniors" });
+  }
 });
 
 
