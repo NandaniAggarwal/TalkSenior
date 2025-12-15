@@ -31,7 +31,7 @@ const allUsers = asyncHandler(async (req, res) => {
       }
     : {};
 
-  console.log("📡 Searching Users in DB with:", JSON.stringify(keyword));
+  console.log(" Searching Users in DB with:", JSON.stringify(keyword));
 
   try {
       const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
@@ -92,40 +92,6 @@ const authUser = asyncHandler(async (req, res) => {
         throw new Error("Invalid Email or Password");
       }
 });
-
-/*
-const getRecommendedSeniors = asyncHandler(async (req, res) => {
-  const { year, topic } = req.query;
-
-  if (!year || !topic) {
-    res.status(400);
-    throw new Error("Please provide year and topic");
-  }
-
-  // 🟣 Normalize case
-  const normalizedTopic = topic.toUpperCase();
-  const normalizedYear = year.toLowerCase(); // (optional, if your DB stores lower case)
-
-  // 🟣 Fetch seniors (case-insensitive match)
-  const seniors = await User.find({
-    canGuide: { $in: [normalizedTopic] }   // both sides upper-case now
-  }).select("-password");
-
-  // 🟣 Score & sort
-  const sorted = seniors.sort((a, b) => {
-    let scoreA = 2;
-    let scoreB = 2;
-
-    if (a.year.toLowerCase() === normalizedYear) scoreA += 3;
-    if (b.year.toLowerCase() === normalizedYear) scoreB += 3;
-
-    return scoreB - scoreA;
-  });
-
-  // 🟣 Return top 3
-  res.json(sorted.slice(0, 3));
-});
-*/
 
 const getRecommendedSeniors = asyncHandler(async (req, res) => {
   const { year, topic } = req.query;

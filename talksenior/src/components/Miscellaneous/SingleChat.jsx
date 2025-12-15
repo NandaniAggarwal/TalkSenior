@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   Box,
   Text,
@@ -31,7 +31,6 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const ENDPOINT = import.meta.env.VITE_BACKEND_URL;
 var socket, selectedChatCompare;
 
-
 const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +54,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
     ChatState();
   const history = useHistory();
   const { chats, setChats } = ChatState();
-  // ===== SANITIZE USER INPUT (protect from XSS) =====
+
 const sanitizeInput = (dirty) => {
   return DOMPurify.sanitize(dirty, {
     ALLOWED_TAGS: [],
@@ -93,6 +92,7 @@ const sanitizeInput = (dirty) => {
       });
     }
   };
+const selectedChatRef = useRef();
 
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage.trim()) {
@@ -117,8 +117,6 @@ const sanitizeInput = (dirty) => {
         );
         socket.emit("new message", data);
         setMessages([...messages, data]);
-
-
       } catch (error) {
         console.error(error);
         toast({
@@ -135,7 +133,6 @@ const sanitizeInput = (dirty) => {
 
   useEffect(() => {
     socket = io(ENDPOINT);
-    window.socket = socket; 
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
@@ -144,34 +141,40 @@ const sanitizeInput = (dirty) => {
 
   useEffect(() => {
     fetchMessages();
-    selectedChatCompare = selectedChat;
+    selectedChatRef.current = selectedChat;
   }, [selectedChat]);
 
-  useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
-      } else {
-        setMessages([...messages, newMessageRecieved]);
-      }
-    });
-  });
+ useEffect(() => {
+  if (!socket) return;
+
+  const handler = (newMessageRecieved) => {
+    if (
+  !selectedChatRef.current ||
+  selectedChatRef.current._id !== newMessageRecieved.chat._id
+)
+{
+      setNotification(prev => [newMessageRecieved, ...prev]);
+      setFetchAgain(prev => !prev);
+    } else {
+      setMessages(prev => [...prev, newMessageRecieved]);
+    }
+  };
+
+  socket.on("message recieved", handler);
+
+  return () => {
+    socket.off("message recieved", handler);
+  };
+}, []);
+
 
  useEffect(() => {
   if (!selectedChat) return;
-
-  // ⭐ JAB CHAT KHOLO → MARK AS READ ⭐
+  socket.emit("join chat", selectedChat._id);
   socket.emit("mark read", {
     chatId: selectedChat._id,
     userId: user._id,
   });
-
 }, [selectedChat, messages]); // messages bhi rakho taki new msg pe read ho jaye
 
 useEffect(() => {
@@ -214,7 +217,7 @@ useEffect(() => {
       }
     }, timerLength);
   };
-
+/*
   const handleFindSeniors = async () => {
     if (!selectedYear || !needHelpTopic) {
       alert("Please select year and enter topic.");
@@ -255,7 +258,7 @@ useEffect(() => {
       });
     }
   };
-
+*/
   return (
     <div >
       {selectedChat ? (

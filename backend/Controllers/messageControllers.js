@@ -8,13 +8,11 @@ const allMessages = asyncHandler(async (req, res) => {
   try {
     const chatId = req.params.chatId;
 
-    // 1. Mark as read (fast because index exists)
     Message.updateMany(
       { chat: chatId, unreadBy: req.user._id },
       { $pull: { unreadBy: req.user._id } }
-    ).exec(); // async, no wait
+    ).exec(); 
 
-    // 2. Fetch messages ( now indexed = super fast )
     const messages = await Message.find({ chat: chatId })
       .sort({ createdAt: 1 }) 
       .populate("sender", "name pic email");
@@ -45,10 +43,8 @@ const sendMessage = asyncHandler(async (req, res) => {
     unreadBy: unread,
   });
 
-  // sender only populated (light)
   await message.populate("sender", "name pic");
-
-  // NO need to populate chat.users every time — slows down
+  
   await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
 
   res.json(message);

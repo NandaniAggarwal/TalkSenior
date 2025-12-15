@@ -60,16 +60,16 @@ socket.on("new message", (newMessageRecieved) => {
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieved.sender._id) return;
 
-      socket.in(user._id).emit("message recieved", newMessageRecieved);
+      socket.to(user._id).emit("message recieved", newMessageRecieved);
     });
   });
 
 socket.on("mark read", ({ chatId, userId }) => {
-    socket.in(chatId).emit("messages read", { chatId, userId });
+  socket.to(chatId).emit("messages read", { chatId, userId });
 });
 
-socket.off("setup", () => {
-    console.log("USER DISCONNECTED");
-    socket.leave(userData._id);
-  });
+
+socket.on("disconnect", () => {
+  console.log("USER DISCONNECTED");
+});
 })

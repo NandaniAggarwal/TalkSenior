@@ -7,8 +7,7 @@ const { getRecommendedSeniors } = require("../Controllers/userControllers");
 router.get("/seniors", getRecommendedSeniors);
 
 router.route('/').post(registeredUser).get(protect,allUsers);
-//router.route('/login').get(authUser);
-//router.route("/").post(registeredUser).get(protect,allUsers);
+
 router.post("/login", authUser);
 
 module.exports=router;

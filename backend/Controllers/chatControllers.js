@@ -8,7 +8,7 @@ const accessChat = asyncHandler(async(req,res)=>{
   userId = sanitize(userId);
   if (!userId) return res.sendStatus(400);
 
-  // 🔥 FAST lookup (indexed)
+
   let chat = await Chat.findOne({
     isGroupChat: false,
     users: { $all: [req.user._id, userId] }
@@ -21,7 +21,6 @@ const accessChat = asyncHandler(async(req,res)=>{
     return res.json(chat);
   }
 
-  // If not found → CREATE chat
   const chatData = {
     chatName: req.user._id.toString() === userId.toString() ? "Saved Messages" : "sender",
     isGroupChat: false,
@@ -60,7 +59,6 @@ const fetchChats = asyncHandler(async(req,res)=>{
     throw new Error(error.message);
   }
 });
-
 
 const createGroupChat=asyncHandler(async(req,res)=>{
     if (!req.body.users || !req.body.name) {
