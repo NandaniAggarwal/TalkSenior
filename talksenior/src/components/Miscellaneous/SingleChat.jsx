@@ -75,7 +75,7 @@ const sanitizeInput = (dirty) => {
       setMessages(data);
       setLoading(false);
       socket.emit("join chat", selectedChat._id);
-      window.socket.emit("mark read", {
+      socket.emit("mark read", {
       chatId: selectedChat._id,
       userId: user._id,
     });
