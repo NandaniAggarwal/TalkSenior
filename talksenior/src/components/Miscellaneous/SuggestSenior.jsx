@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Text,
@@ -11,102 +11,77 @@ import {
 import { ChatState } from "../../Context/ChatProvider";
 import axios from "axios";
 import "../../components/style.css";
-import io from "socket.io-client";
-import animationData from "../../animations/typing.json";
 import { useHistory } from "react-router-dom";
+import socket from "../../socket";
+
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-const ENDPOINT = import.meta.env.VITE_BACKEND_URL;
-var socket, selectedChatCompare;
 
-const SuggestSenior = ({ fetchAgain, setFetchAgain , showSeniorFinder}) => {
+const SuggestSenior = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    notification,
+    setNotification,
+    chats,
+    setChats,
+    socketConnected
+  } = ChatState();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [typing, setTyping] = useState(false);
-  const [socketConnected, setSocketConnected] = useState(false);
   const [selectedYear, setSelectedYear] = useState("");
   const [needHelpTopic, setNeedHelpTopic] = useState("");
   const [recommendedSeniors, setRecommendedSeniors] = useState([]);
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: { preserveAspectRatio: "xMidYMid slice" },
-  };
+
+  const selectedChatRef = useRef(null);
 
   const toast = useToast();
-  const { selectedChat, setSelectedChat, user, notification, setNotification } =
-    ChatState();
   const history = useHistory();
-  const { chats, setChats } = ChatState();
 
-  const fetchMessages = async () => {
-    if (!selectedChat) return;
+  /* ================= SOCKET SETUP (FIXED) ================= */
+  useEffect(() => {
+    if (!user) return;
+
+    socket.on("message recieved", (newMessage) => {
+      if (
+        !selectedChatRef.current ||
+        selectedChatRef.current._id !== newMessage.chat._id
+      ) {
+        setNotification((prev) => [newMessage, ...prev]);
+        setFetchAgain((prev) => !prev);
+      } else {
+        setMessages((prev) => [...prev, newMessage]);
+      }
+    });
+
+    return () => {
+    socket.off("message recieved");
+    };
+  }, []);
+
+  /* ================= CHAT CHANGE ================= */
+  useEffect(() => {
+    selectedChatRef.current = selectedChat;
+  }, [selectedChat]);
+
+  /* ================= FIND SENIORS ================= */
+  const handleFindSeniors = async () => {
+    if (!selectedYear || !needHelpTopic) {
+      alert("Please select year and enter topic.");
+      return;
+    }
 
     try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      setLoading(true);
       const { data } = await axios.get(
-        `${backendUrl}/api/message/${selectedChat._id}`,
-        config
+        `${backendUrl}/api/user/seniors?year=${selectedYear}&topic=${needHelpTopic}`
       );
-      setMessages(data);
-      setLoading(false);
-      socket.emit("join chat", selectedChat._id);
-    } catch (error) {
-      console.log(error);
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Messages",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+      setRecommendedSeniors(data);
+    } catch (err) {
+      console.error("Error fetching seniors:", err);
     }
   };
 
-  useEffect(() => {
-    socket = io(ENDPOINT);
-    socket.emit("setup", user);
-    socket.on("connected", () => setSocketConnected(true));
-    socket.on("typing", () => setIsTyping(true));
-    socket.on("stop typing", () => setIsTyping(false));
-  }, []);
-
-  useEffect(() => {
-    fetchMessages();
-    selectedChatCompare = selectedChat;
-  }, [selectedChat]);
-
-  useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
-      } else {
-        setMessages([...messages, newMessageRecieved]);
-      }
-    });
-  });
-
-const handleFindSeniors = async () => { 
-  if (!selectedYear || !needHelpTopic) { 
-    alert("Please select year and enter topic."); 
-    return; 
-  } 
-  try { 
-    const { data } = await axios.get( `${backendUrl}/api/user/seniors?year=${selectedYear}&topic=${needHelpTopic}` ); 
-    setRecommendedSeniors(data); 
-  } catch (err) { 
-    console.error("Error fetching seniors:", err); } 
-  };
-
+  /* ================= ACCESS CHAT ================= */
   const accessChat = async (userId) => {
     try {
       const config = {
@@ -115,10 +90,17 @@ const handleFindSeniors = async () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`${backendUrl}/api/chat`, { userId }, config);
+
+      const { data } = await axios.post(
+        `${backendUrl}/api/chat`,
+        { userId },
+        config
+      );
+
       if (!chats.find((c) => c._id === data._id)) {
         setChats([data, ...chats]);
       }
+
       setSelectedChat(data);
       history.push("/chats");
     } catch (error) {

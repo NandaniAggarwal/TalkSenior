@@ -2,64 +2,86 @@ import React, { useEffect, useState } from "react";
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Stack, Text, Button, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import ChatLoading from "./ChatLoading";
 import { ChatState } from "../../Context/ChatProvider";
 import { getSender } from "../config/ChatLogics";
 import GroupChatModal from "./GroupChatModal";
+import socket from "../../socket";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const MyChats = ({ fetchAgain, setFetchAgain ,showSeniorFinder}) => {
+const MyChats = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
   const [loggedUser, setLoggedUser] = useState();
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const { selectedChat, setSelectedChat, user, chats, setChats,socketConnected } = ChatState();
   const toast = useToast();
 
   const fetchChats = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const config = {
+        headers: { Authorization: `Bearer ${user.token}` },
+      };
+
       const { data } = await axios.get(`${backendUrl}/api/chat`, config);
 
       const updated = data.map((chat) => {
-  const arr = chat.latestMessage?.unreadBy || [];
-  const hasUnreadForMe = arr.some((u) => {
-    if (!u) return false;
-    if (typeof u === "string") return u === user._id;
-    if (u._id) return u._id.toString() === user._id;
-    return u.toString() === user._id;
-  });
-  return { ...chat, unreadCount: hasUnreadForMe ? 1 : 0 };
-});
+        const arr = chat.latestMessage?.unreadBy || [];
+        const hasUnread = arr.some((u) =>
+          typeof u === "string" ? u === user._id : u?._id === user._id
+        );
+        return { ...chat, unreadCount: hasUnread ? 1 : 0 };
+      });
+
       setChats(updated);
+      updated.forEach((chat) => {
+  socket.emit("join chat", chat._id);
+});
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: "Failed to Load the chats",
+        title: "Error",
+        description: "Failed to load chats",
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "bottom-left",
       });
     }
   };
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("userInfo"));
-    setLoggedUser(storedUser);
-
-    if (storedUser?.token) fetchChats();
+    const stored = JSON.parse(localStorage.getItem("userInfo"));
+    setLoggedUser(stored);
+    if (stored?.token) fetchChats();
   }, [fetchAgain]);
 
+
   useEffect(() => {
-  if (!window.socket) return;
+    if (!user) return;
 
-  window.socket.on("messages read", ({ chatId }) => {
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
-      )
-    );
-  });
-}, []);
+    socket.on("message recieved", (msg) => {
+      console.log("New message received via mychats", msg);
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat._id === msg.chat._id
+            ? { ...chat, unreadCount: 1, latestMessage: msg }
+            : chat
+        )
+      );
+    });
 
+    socket.on("messages read", ({ chatId }) => {
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
+        )
+      );
+    });
+
+    return () => {
+      socket.off("message recieved");
+      socket.off("messages read");
+    };
+
+  }, [user]);
+
+  
   return (
     <div>
       <Box

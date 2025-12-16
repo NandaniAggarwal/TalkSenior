@@ -35,18 +35,20 @@ const sendMessage = asyncHandler(async (req, res) => {
   const unread = chat.users.filter(
     u => u.toString() !== req.user._id.toString()
   );
-
-  const message = await Message.create({
+  let message = await Message.create({
     sender: req.user._id,
     content,
     chat: chatId,
     unreadBy: unread,
   });
-
-  await message.populate("sender", "name pic");
-  
-  await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
-
+  message = await message.populate("sender", "name pic email");
+  // 2) populate chat (so chat._id exists)
+  message = await message.populate({
+    path: "chat",
+    select: "_id users chatName isGroupChat",
+  });
+  // 3) optional: populate chat.users for frontend convenience
+  message = await message.populate("chat.users", "name pic email");
   res.json(message);
 });
 

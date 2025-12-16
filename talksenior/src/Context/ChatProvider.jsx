@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
+import socket from "../socket";
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
@@ -7,6 +7,7 @@ const ChatProvider = ({ children }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [chats, setChats] = useState([]);
     const [notification, setNotification] = useState([]);
+    const [socketConnected, setSocketConnected] = useState(false);
 
     useEffect(() => {
         const userInfo = localStorage.getItem("userInfo");
@@ -20,8 +21,24 @@ const ChatProvider = ({ children }) => {
         }
     }, []);
 
+    useEffect(() => {
+    if (!user) return;
+
+    socket.connect();
+    socket.emit("setup", user);
+
+    socket.on("connected", () => {
+      setSocketConnected(true);
+      console.log("Socket connected");
+    });
+
+    return () => {
+      socket.off("connected");
+    };
+  }, [user]);
+
     return (
-        <ChatContext.Provider value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats, notification, setNotification }}>
+        <ChatContext.Provider value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats, notification, setNotification ,socketConnected}}>
             {children}
         </ChatContext.Provider>
     );

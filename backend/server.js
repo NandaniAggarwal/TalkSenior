@@ -32,7 +32,7 @@ const server=app.listen(port,()=>{
 });
 
 const io= require('socket.io')(server,{
-    pingTimeOut:60000,
+    pingTimeout:60000,
     cors:{
         origin: ["http://localhost:5173","https://talksenior-1.onrender.com"],
     },
@@ -49,9 +49,17 @@ socket.on("join chat", (room) => {
     socket.join(room);
     console.log("User Joined Room: " + room);
   });
-socket.on("typing", (room) => socket.in(room).emit("typing"));
-socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+//socket.on("typing", (room) => socket.in(room).emit("typing"));
+//socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
+socket.on("typing", (room) => {
+  socket.in(room).emit("typing", room);
+});
+socket.on("stop typing", (room) => {
+  socket.in(room).emit("stop typing", room);
+});
+
+/*
 socket.on("new message", (newMessageRecieved) => {
     var chat = newMessageRecieved.chat;
 
@@ -63,11 +71,20 @@ socket.on("new message", (newMessageRecieved) => {
       socket.to(user._id).emit("message recieved", newMessageRecieved);
     });
   });
+*/
+socket.on("new message", (newMessageRecieved) => {
+  const chat = newMessageRecieved.chat;
+  console.log("🔥 SERVER got new message", newMessageRecieved);
+
+  if (!chat?._id) return console.log("chat._id not defined");
+  // broadcast to everyone in that chat room except sender
+  console.log("📤 SERVER emitting to room:", chat._id);
+  socket.to(chat._id).emit("message recieved", newMessageRecieved);
+});
 
 socket.on("mark read", ({ chatId, userId }) => {
   socket.to(chatId).emit("messages read", { chatId, userId });
 });
-
 
 socket.on("disconnect", () => {
   console.log("USER DISCONNECTED");
