@@ -11,7 +11,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const MyChats = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
   const [loggedUser, setLoggedUser] = useState();
-  const { selectedChat, setSelectedChat, user, chats, setChats,socketConnected } = ChatState();
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
 
   const fetchChats = async () => {
@@ -32,7 +32,7 @@ const MyChats = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
 
       setChats(updated);
       updated.forEach((chat) => {
-  socket.emit("join chat", chat._id);
+      socket.emit("join chat", chat._id);
 });
     } catch (error) {
       toast({
@@ -51,21 +51,10 @@ const MyChats = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
     if (stored?.token) fetchChats();
   }, [fetchAgain]);
 
-
+/*
   useEffect(() => {
     if (!user) return;
-
-    socket.on("message recieved", (msg) => {
-      console.log("New message received via mychats", msg);
-      setChats((prev) =>
-        prev.map((chat) =>
-          chat._id === msg.chat._id
-            ? { ...chat, unreadCount: 1, latestMessage: msg }
-            : chat
-        )
-      );
-    });
-
+    
     socket.on("messages read", ({ chatId }) => {
       setChats((prev) =>
         prev.map((chat) =>
@@ -75,13 +64,37 @@ const MyChats = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
     });
 
     return () => {
-      socket.off("message recieved");
       socket.off("messages read");
     };
 
   }, [user]);
 
-  
+
+  useEffect(() => {
+  if (!user) return;
+
+  const handleMessage = (newMessage) => {
+    console.log("New message received via single chat:", newMessage);
+
+    if (
+      !selectedChatRef.current ||
+      selectedChatRef.current._id !== newMessage.chat._id
+    ) {
+      setNotification((prev) => [newMessage, ...prev]);
+      setFetchAgain((prev) => !prev);
+    } else {
+      setMessages((prev) => [...prev, newMessage]);
+    }
+  };
+
+  socket.on("message recieved", handleMessage);
+
+  return () => {
+    socket.off("message recieved", handleMessage);
+  };
+}, []); // 🔥 EMPTY dependency
+
+    */
   return (
     <div>
       <Box
@@ -157,7 +170,18 @@ const MyChats = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
               {chats.map((chat) => (
                 <Box
                   key={chat._id}
-                  onClick={() => setSelectedChat(chat)}
+                  onClick={() => {
+  setSelectedChat(chat);
+
+  // 🔥 instantly remove red dot
+  setChats((prev) =>
+    prev.map((c) =>
+      c._id === chat._id
+        ? { ...c, unreadCount: 0 }
+        : c
+    )
+  );
+}}
                   cursor="pointer"
                   bg={
                     selectedChat === chat

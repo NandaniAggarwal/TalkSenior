@@ -27,7 +27,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const ENDPOINT = import.meta.env.VITE_BACKEND_URL;
 
 const SingleChat = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
-  const { selectedChat, setSelectedChat, user, notification, setNotification,socketConnected } =
+  const { selectedChat, setSelectedChat, user, notification, setNotification,socketConnected ,chats,setChats} =
     ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -67,7 +67,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
     setIsTyping(false);
   }
     });
-
+/*
     socket.on("message recieved", (newMessage) => {
       console.log("New message received via single chat:", newMessage);
       if (
@@ -91,6 +91,59 @@ const SingleChat = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
         );
       }
     });
+*/
+    socket.on("message recieved", (newMessage) => {
+  if (
+    selectedChatRef.current &&
+    selectedChatRef.current._id === newMessage.chat._id
+  ) {
+    // 👀 receiver is viewing this chat
+    setMessages((prev) => [...prev, newMessage]);
+
+    // 🔥 MARK READ IMMEDIATELY
+    socket.emit("mark read", {
+      chatId: newMessage.chat._id,
+      userId: user._id,
+    });
+  } else {
+    // 👁️ chat not open
+    /*
+    setNotification((prev) => [newMessage, ...prev]);
+    setFetchAgain((prev) => !prev);
+    setChats((prevChats) =>
+      //ye kra hai 
+    prevChats.map((chat) =>
+      chat._id === newMessage.chat._id
+        ? { ...chat, unreadCount: 1 }
+        : chat
+    )
+  );*/
+  setChats((prevChats) =>
+    prevChats.map((chat) =>
+      chat._id === newMessage.chat._id
+        ? { ...chat, unreadCount: 1 }
+        : chat
+    )
+  );
+
+  setNotification((prev) => [newMessage, ...prev]);
+  }
+    });
+
+    socket.on("messages read", ({ chatId, userId }) => {
+  if (selectedChatRef.current?._id === chatId) {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.sender._id === userId
+          ? msg
+          : {
+              ...msg,
+              unreadBy: msg.unreadBy?.filter((id) => id !== userId),
+            }
+      )
+    );
+  }
+    });
 
     return () => {
       socket.off("connected");
@@ -100,6 +153,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
       socket.off("messages read");
     };
   }, [user]);
+
+
+
+  useEffect(() => {
+    if (!selectedChat) return;
+    selectedChatRef.current = selectedChat;
+    socket.emit("join chat", selectedChat._id);
+    fetchMessages();
+  }, [selectedChat]);
+
 
   /* ================= FETCH MESSAGES ================= */
   const fetchMessages = async () => {
@@ -134,13 +197,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
       });
     }
   };
-
-  useEffect(() => {
-    if (!selectedChat) return;
-    selectedChatRef.current = selectedChat;
-    socket.emit("join chat", selectedChat._id);
-    fetchMessages();
-  }, [selectedChat]);
 
   /* ================= SEND MESSAGE ================= */
   const sendMessage = async (e) => {

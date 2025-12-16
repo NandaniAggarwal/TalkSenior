@@ -38,26 +38,6 @@ const SuggestSenior = ({ fetchAgain, setFetchAgain, showSeniorFinder }) => {
   const toast = useToast();
   const history = useHistory();
 
-  /* ================= SOCKET SETUP (FIXED) ================= */
-  useEffect(() => {
-    if (!user) return;
-
-    socket.on("message recieved", (newMessage) => {
-      if (
-        !selectedChatRef.current ||
-        selectedChatRef.current._id !== newMessage.chat._id
-      ) {
-        setNotification((prev) => [newMessage, ...prev]);
-        setFetchAgain((prev) => !prev);
-      } else {
-        setMessages((prev) => [...prev, newMessage]);
-      }
-    });
-
-    return () => {
-    socket.off("message recieved");
-    };
-  }, []);
 
   /* ================= CHAT CHANGE ================= */
   useEffect(() => {
